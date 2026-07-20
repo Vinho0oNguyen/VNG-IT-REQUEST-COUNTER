@@ -2,6 +2,8 @@
 
 const http = require("node:http");
 
+const { createMemoryCounterStore } = require("./counter-store");
+
 const dashboardHtml = `<!doctype html>
 <html lang="vi">
 <head>
@@ -174,7 +176,7 @@ const dashboardHtml = `<!doctype html>
     </section>
 
     <button id="send-request" type="button">Gửi một request thử</button>
-    <p class="note">Số liệu được giữ trong bộ nhớ và bắt đầu lại khi ứng dụng được restart hoặc redeploy.</p>
+    <p class="note">Số liệu được lưu trên volume bền vững và vẫn được giữ nguyên khi restart hoặc redeploy.</p>
   </main>
 
   <script>
@@ -226,23 +228,18 @@ function sendJson(response, statusCode, data, extraHeaders = {}) {
 
 function createRequestCounterServer(options = {}) {
   const startedAt = options.startedAt || new Date();
-  let count = 0;
-  let lastRequestAt = null;
+  const counter = options.counter || createMemoryCounterStore();
 
   return http.createServer((request, response) => {
     const url = new URL(request.url || "/", "http://localhost");
     const isCounted = !passivePaths.has(url.pathname);
-
-    if (isCounted) {
-      count += 1;
-      lastRequestAt = new Date();
-    }
+    const snapshot = isCounted ? counter.increment() : counter.getSnapshot();
 
     const commonHeaders = {
       "Referrer-Policy": "no-referrer",
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY",
-      "X-Request-Count": String(count),
+      "X-Request-Count": String(snapshot.count),
     };
 
     if (request.method === "GET" && url.pathname === "/health") {
@@ -252,15 +249,16 @@ function createRequestCounterServer(options = {}) {
 
     if (request.method === "GET" && url.pathname === "/api/count") {
       sendJson(response, 200, {
-        count,
+        count: snapshot.count,
         startedAt: startedAt.toISOString(),
-        lastRequestAt: lastRequestAt?.toISOString() || null,
+        lastRequestAt: snapshot.lastRequestAt,
+        persistent: Boolean(counter.filePath),
       }, commonHeaders);
       return;
     }
 
     if (request.method === "POST" && url.pathname === "/api/request") {
-      sendJson(response, 200, { count }, commonHeaders);
+      sendJson(response, 200, { count: snapshot.count }, commonHeaders);
       return;
     }
 

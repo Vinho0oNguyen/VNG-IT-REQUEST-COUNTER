@@ -1,6 +1,6 @@
 # VNG-IT-REQUEST-COUNTER
 
-Ứng dụng Node.js nhỏ hiển thị số request HTTP đi vào app kể từ lúc process khởi động.
+Ứng dụng Node.js nhỏ hiển thị tổng số request HTTP đi vào app và lưu số liệu trên volume bền vững.
 
 ## Chạy local
 
@@ -11,6 +11,8 @@ npm start
 ```
 
 Mặc định app chạy tại `http://localhost:3000`; có thể đổi cổng bằng biến môi trường `PORT`.
+Khi chạy local, app lưu dữ liệu vào `./data/request-count.json` theo mặc định. Dùng
+`REQUEST_COUNT_FILE` để chọn đường dẫn khác.
 
 ## Endpoint
 
@@ -19,7 +21,11 @@ Mặc định app chạy tại `http://localhost:3000`; có thể đổi cổng 
 - `GET /api/count`: đọc số liệu, không làm tăng bộ đếm.
 - `GET /health`: healthcheck, không làm tăng bộ đếm.
 
-Số liệu chỉ nằm trong bộ nhớ nên sẽ bắt đầu lại khi process restart hoặc ứng dụng được redeploy.
+Số liệu được ghi nguyên tử vào file JSON. Trên Dokploy, volume tên
+`vng-it-request-counter-data` được mount tại `/data`, vì vậy số request vẫn được giữ khi restart hoặc redeploy.
+
+`REQUEST_COUNT_INITIAL` chỉ được dùng để nhập số liệu cũ trong lần đầu khi file chưa tồn tại; nếu file đã có,
+giá trị trong file luôn được ưu tiên.
 
 ## Production
 

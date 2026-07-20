@@ -1,9 +1,13 @@
 "use strict";
 
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
 const { after, before, test } = require("node:test");
 
 const { createRequestCounterServer } = require("../app");
+const { createFileCounterStore } = require("../counter-store");
 
 let baseUrl;
 let server;
@@ -48,4 +52,24 @@ test("unknown routes are counted and return 404", async () => {
   const response = await fetch(`${baseUrl}/missing`);
   assert.equal(response.status, 404);
   assert.equal(response.headers.get("x-request-count"), "3");
+});
+
+test("file store preserves the counter when it is opened again", () => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), "request-counter-"));
+  const filePath = path.join(directory, "count.json");
+
+  try {
+    const firstStore = createFileCounterStore(filePath, 14);
+    assert.deepEqual(firstStore.getSnapshot(), { count: 14, lastRequestAt: null });
+
+    firstStore.increment(new Date("2026-07-20T13:00:00.000Z"));
+
+    const reopenedStore = createFileCounterStore(filePath, 0);
+    assert.deepEqual(reopenedStore.getSnapshot(), {
+      count: 15,
+      lastRequestAt: "2026-07-20T13:00:00.000Z",
+    });
+  } finally {
+    fs.rmSync(directory, { recursive: true, force: true });
+  }
 });
