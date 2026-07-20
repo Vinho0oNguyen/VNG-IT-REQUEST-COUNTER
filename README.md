@@ -20,3 +20,11 @@ Mặc định app chạy tại `http://localhost:3000`; có thể đổi cổng 
 - `GET /health`: healthcheck, không làm tăng bộ đếm.
 
 Số liệu chỉ nằm trong bộ nhớ nên sẽ bắt đầu lại khi process restart hoặc ứng dụng được redeploy.
+
+## Production
+
+App đang chạy trên Dokploy tại:
+
+<https://vng-it-request-counter-uziz5s-d5127f-103-72-57-55.sslip.io>
+
+Thông tin redeploy không chứa secret được lưu trong `.dokploy/deploy.json`.

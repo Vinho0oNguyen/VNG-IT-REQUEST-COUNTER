@@ -1,0 +1,19 @@
+{
+  "instance": "http://103.72.57.55:3000",
+  "projectId": "rRzo6fzrRq95UEepLsnfh",
+  "applicationId": "cHABQGc8gu33i9emYCAx-",
+  "appName": "vng-it-request-counter-uziz5s",
+  "source": "git",
+  "repo": "https://github.com/Vinho0oNguyen/VNG-IT-REQUEST-COUNTER.git",
+  "branch": "main",
+  "image": null,
+  "path": null,
+  "dropBuildPath": null,
+  "buildType": "nixpacks",
+  "port": 3000,
+  "publishDirectory": null,
+  "domain": "vng-it-request-counter-uziz5s-d5127f-103-72-57-55.sslip.io",
+  "url": "https://vng-it-request-counter-uziz5s-d5127f-103-72-57-55.sslip.io",
+  "createdAt": "2026-07-20T19:50:22",
+  "lastDeployedAt": "2026-07-20T19:53:31"
+}
