@@ -162,7 +162,7 @@ const dashboardHtml = `<!doctype html>
 </head>
 <body>
   <main>
-    <div class="status">Ứng dụng đang hoạt động</div>
+    <div class="status">[VNG-DOKPLOY] Ứng dụng đang hoạt động</div>
     <h1>Request<br>Counter</h1>
     <p class="intro">Theo dõi lượng HTTP request thực đi vào ứng dụng. Healthcheck và request đọc số liệu không được tính để kết quả không tự tăng.</p>
 
