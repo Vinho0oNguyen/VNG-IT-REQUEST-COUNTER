@@ -54,6 +54,24 @@ test("unknown routes are counted and return 404", async () => {
   assert.equal(response.headers.get("x-request-count"), "3");
 });
 
+test("GET /api/uptime returns uptime and does not increment the counter", async () => {
+  const countBefore = await (await fetch(`${baseUrl}/api/count`)).json();
+
+  const uptimeResponse = await fetch(`${baseUrl}/api/uptime`);
+  assert.equal(uptimeResponse.status, 200);
+  assert.match(uptimeResponse.headers.get("content-type"), /application\/json/);
+
+  const data = await uptimeResponse.json();
+  assert.equal(typeof data.uptimeSeconds, "number");
+  assert.ok(data.uptimeSeconds >= 0);
+
+  // X-Request-Count must reflect the count before the uptime call (passive)
+  assert.equal(uptimeResponse.headers.get("x-request-count"), String(countBefore.count));
+
+  const countAfter = await (await fetch(`${baseUrl}/api/count`)).json();
+  assert.equal(countAfter.count, countBefore.count);
+});
+
 test("file store preserves the counter when it is opened again", () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "request-counter-"));
   const filePath = path.join(directory, "count.json");

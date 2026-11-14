@@ -215,7 +215,7 @@ const dashboardHtml = `<!doctype html>
 </body>
 </html>`;
 
-const passivePaths = new Set(["/health", "/api/count", "/favicon.ico"]);
+const passivePaths = new Set(["/health", "/api/count", "/api/uptime", "/favicon.ico"]);
 
 function sendJson(response, statusCode, data, extraHeaders = {}) {
   response.writeHead(statusCode, {
@@ -253,6 +253,13 @@ function createRequestCounterServer(options = {}) {
         startedAt: startedAt.toISOString(),
         lastRequestAt: snapshot.lastRequestAt,
         persistent: Boolean(counter.filePath),
+      }, commonHeaders);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/uptime") {
+      sendJson(response, 200, {
+        uptimeSeconds: (Date.now() - startedAt.getTime()) / 1000,
       }, commonHeaders);
       return;
     }
