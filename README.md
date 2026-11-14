@@ -19,6 +19,7 @@ Khi chạy local, app lưu dữ liệu vào `./data/request-count.json` theo m�
 - `GET /`: dashboard và được tính là một request.
 - `POST /api/request`: tạo một request thử và tăng bộ đếm.
 - `GET /api/count`: đọc số liệu, không làm tăng bộ đếm.
+- `GET /api/uptime`: đọc số giây ứng dụng đã chạy, không làm tăng bộ đếm.
 - `GET /health`: healthcheck, không làm tăng bộ đếm.
 
 Số liệu được ghi nguyên tử vào file JSON. Trên Dokploy, volume tên
