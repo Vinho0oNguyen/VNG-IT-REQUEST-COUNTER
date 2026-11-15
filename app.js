@@ -1,6 +1,7 @@
 "use strict";
 
 const http = require("node:http");
+const { version } = require("./package.json");
 
 const { createMemoryCounterStore } = require("./counter-store");
 
@@ -215,7 +216,7 @@ const dashboardHtml = `<!doctype html>
 </body>
 </html>`;
 
-const passivePaths = new Set(["/health", "/api/count", "/favicon.ico"]);
+const passivePaths = new Set(["/health", "/api/count", "/api/version", "/favicon.ico"]);
 
 function sendJson(response, statusCode, data, extraHeaders = {}) {
   response.writeHead(statusCode, {
@@ -254,6 +255,11 @@ function createRequestCounterServer(options = {}) {
         lastRequestAt: snapshot.lastRequestAt,
         persistent: Boolean(counter.filePath),
       }, commonHeaders);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/version") {
+      sendJson(response, 200, { version }, commonHeaders);
       return;
     }
 

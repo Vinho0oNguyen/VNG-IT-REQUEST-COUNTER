@@ -54,6 +54,20 @@ test("unknown routes are counted and return 404", async () => {
   assert.equal(response.headers.get("x-request-count"), "3");
 });
 
+test("GET /api/version returns version and does not increment counter", async () => {
+  const beforeResponse = await fetch(`${baseUrl}/api/count`);
+  const countBefore = (await beforeResponse.json()).count;
+
+  const versionResponse = await fetch(`${baseUrl}/api/version`);
+  assert.equal(versionResponse.status, 200);
+  assert.match(versionResponse.headers.get("content-type"), /application\/json/);
+  const { version } = require("../package.json");
+  assert.deepEqual(await versionResponse.json(), { version });
+
+  const afterResponse = await fetch(`${baseUrl}/api/count`);
+  assert.equal((await afterResponse.json()).count, countBefore);
+});
+
 test("file store preserves the counter when it is opened again", () => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), "request-counter-"));
   const filePath = path.join(directory, "count.json");
