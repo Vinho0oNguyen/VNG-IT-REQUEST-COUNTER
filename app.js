@@ -215,7 +215,7 @@ const dashboardHtml = `<!doctype html>
 </body>
 </html>`;
 
-const passivePaths = new Set(["/health", "/api/count", "/favicon.ico"]);
+const passivePaths = new Set(["/health", "/api/count", "/favicon.ico", "/api/ping"]);
 
 function sendJson(response, statusCode, data, extraHeaders = {}) {
   response.writeHead(statusCode, {
@@ -254,6 +254,11 @@ function createRequestCounterServer(options = {}) {
         lastRequestAt: snapshot.lastRequestAt,
         persistent: Boolean(counter.filePath),
       }, commonHeaders);
+      return;
+    }
+
+    if (request.method === "GET" && url.pathname === "/api/ping") {
+      sendJson(response, 200, { ok: true }, commonHeaders);
       return;
     }
 

@@ -34,6 +34,21 @@ test("healthcheck does not increment the counter", async () => {
   assert.equal((await countResponse.json()).count, 0);
 });
 
+test("ping returns ok and does not increment the counter", async () => {
+  const countBefore = await (await fetch(`${baseUrl}/api/count`)).json();
+
+  const pingResponse = await fetch(`${baseUrl}/api/ping`);
+  assert.equal(pingResponse.status, 200);
+  assert.equal(pingResponse.headers.get("content-type"), "application/json; charset=utf-8");
+  assert.deepEqual(await pingResponse.json(), { ok: true });
+  assert.equal(pingResponse.headers.get("x-request-count"), String(countBefore.count));
+
+  await fetch(`${baseUrl}/api/ping`);
+
+  const countAfter = await (await fetch(`${baseUrl}/api/count`)).json();
+  assert.equal(countAfter.count, countBefore.count);
+});
+
 test("dashboard and explicit request increment the counter", async () => {
   const dashboardResponse = await fetch(`${baseUrl}/`);
   assert.equal(dashboardResponse.status, 200);
